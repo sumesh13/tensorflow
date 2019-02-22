@@ -17,36 +17,37 @@ limitations under the License.
 #define TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_FEATURES_H_
 
 #include <string>
+#include "llvm/ADT/Triple.h"
 #include "llvm/IR/Intrinsics.h"
+#include "llvm/IR/Module.h"
 
 namespace xla {
 namespace llvm_ir {
-
-// Abstract interface for classes providing information about the gpu target
-// we're compiling for.
-class LLVMTargetFeatures {
- public:
-  // Return  llvm intrinsic for target 
-  virtual llvm::Intrinsic::ID GetIntrinsicID(const std::string &name) = 0;
-
-  virtual ~LLVMTargetFeatures() = default;
+// Enmerations to get target specific intrinsics or function calls
+typedef enum  TargetIntrinsicID {
+  kShfl_down_f32,
+  kShfl_down_i32,
+  kThread_id_x,
+  kThread_id_y,
+  kThread_id_z,
+  kBlock_id_x,
+  kBlock_id_y,
+  kBlock_id_z,
+  kBarrier_id,
 };
 
-class AMDGPUMachineFeatures : public LLVMTargetFeatures {
- public:
-  // Return  llvm intrinsic for AMD target 
-  llvm::Intrinsic::ID GetIntrinsicID(const std::string &name);
-  AMDGPUMachineFeatures(){};
-  ~AMDGPUMachineFeatures(){};
+struct TargetIntrinsics {
+  llvm::Intrinsic::ID nvptx_intrinsic;
+  llvm::Intrinsic::ID amdgpu_intrinsic;
 };
 
-class NVPTXMachineFeatures : public LLVMTargetFeatures {
- public:
-  // Return  llvm intrinsic for NVIDIA target 
-  llvm::Intrinsic::ID GetIntrinsicID(const std::string &name);
-  NVPTXMachineFeatures(){};
-  ~NVPTXMachineFeatures(){};
-};
+
+typedef struct TargetIntrinsics GPUIntrinsics; 
+
+//GPUIntrinsics GetIntrinsic(TargetIntrinsicID intrin);
+
+//llvm::Intrinsic::ID GetLLVMIntrinsicID(TargetIntrinsicID intrin, 
+//        llvm::Module* module);
 
 }  // namespace gpu
 }  // namespace xla

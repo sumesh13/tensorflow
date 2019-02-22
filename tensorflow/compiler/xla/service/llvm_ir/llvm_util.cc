@@ -93,6 +93,72 @@ llvm::CallInst* EmitCallToIntrinsic(
   return b->CreateCall(intrinsic, AsArrayRef(operands));
 }
 
+GPUIntrinsics GetIntrinsic(TargetIntrinsicID intrin);
+/*GPUIntrinsics GetIntrinsic(TargetIntrinsicID intrin){
+
+    switch(intrin){
+      case kShfl_down_f32:{
+         return {llvm::Intrinsic::nvvm_shfl_sync_down_f32, llvm::Intrinsic::not_intrinsic};
+       }
+      case kShfl_down_i32:{
+         return {llvm::Intrinsic::nvvm_shfl_sync_down_i32, llvm::Intrinsic::not_intrinsic};
+       }
+      case kThread_id_x:{
+          return  {llvm::Intrinsic::nvvm_read_ptx_sreg_tid_x, llvm::Intrinsic::amdgcn_workitem_id_x};
+       }
+      case   kThread_id_y:{
+         return {llvm::Intrinsic::nvvm_read_ptx_sreg_tid_y, llvm::Intrinsic::amdgcn_workitem_id_y};
+       }
+      case  kThread_id_z:{
+         return {llvm::Intrinsic::nvvm_read_ptx_sreg_tid_z, llvm::Intrinsic::amdgcn_workitem_id_z};
+       }
+      case  kBlock_id_x:{
+         return {llvm::Intrinsic::nvvm_read_ptx_sreg_ctaid_x, llvm::Intrinsic::amdgcn_workgroup_id_x};
+       }
+      case  kBlock_id_y:{
+         return {llvm::Intrinsic::nvvm_read_ptx_sreg_ctaid_y, llvm::Intrinsic::amdgcn_workgroup_id_y};
+       }
+      case  kBlock_id_z:{
+         return {llvm::Intrinsic::nvvm_read_ptx_sreg_ctaid_z, llvm::Intrinsic::amdgcn_workgroup_id_z};
+       }
+      case  kBarrier_id:{
+         return {llvm::Intrinsic::nvvm_barrier0, llvm::Intrinsic::amdgcn_s_barrier};
+       }
+
+    }
+
+    return {llvm::Intrinsic::not_intrinsic, llvm::Intrinsic::not_intrinsic};
+}
+*/
+
+llvm::CallInst* EmitCallToTargetIntrinsic(
+    TargetIntrinsicID intrin, absl::Span<llvm::Value* const> operands,
+    absl::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b) {
+  llvm::Module* module = ModuleFromIRBuilder(b);
+  GPUIntrinsics intrin_id = GetIntrinsic(intrin);
+  llvm::Triple target_triple = llvm::Triple(module->getTargetTriple());
+
+  llvm::Intrinsic::ID intrinsic_id = llvm::Intrinsic::not_intrinsic;
+
+  if ((target_triple.getArch() == llvm::Triple::nvptx) || 
+     (target_triple.getArch() == llvm::Triple::nvptx64)){ 
+        intrinsic_id = intrin_id.nvptx_intrinsic;
+  }
+  else if  (target_triple.getArch() == llvm::Triple::amdgcn) {
+       intrinsic_id = intrin_id.amdgpu_intrinsic;
+
+  }
+  else {
+
+      LOG(FATAL) << "Invalid triple " << target_triple.str();
+
+  }
+
+  llvm::Function* intrinsic = llvm::Intrinsic::getDeclaration(
+      module, intrinsic_id, AsArrayRef(overloaded_types));
+  return b->CreateCall(intrinsic, AsArrayRef(operands));
+}
+
 llvm::Value* EmitFloatMax(llvm::Value* lhs_value, llvm::Value* rhs_value,
                           llvm::IRBuilder<>* b) {
   if (b->getFastMathFlags().noNaNs()) {
