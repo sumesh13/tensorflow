@@ -57,19 +57,14 @@ tf_cc_test(
     ],
 )
 
-cc_library(
-    name = "llvm_target_helper",
-    srcs = ["llvm_target_helper.cc"],
-    hdrs = ["llvm_target_helper.h" ],
-    deps = ["//tensorflow/compiler/xla:util"],
-)
 
 cc_library(
     name = "llvm_util",
     srcs = ["llvm_util.cc"],
-    hdrs = ["llvm_util.h"],
+    hdrs = ["llvm_util.h",
+           "llvm_target_helper.h",
+           ],
     deps = [
-        ":llvm_target_helper",
         "//tensorflow/compiler/xla:literal",
         "//tensorflow/compiler/xla:shape_util",
         "//tensorflow/compiler/xla:types",
@@ -150,7 +145,6 @@ cc_library(
     deps = [
         ":ir_array",
         ":llvm_util",
-        ":llvm_target_helper",
         "//tensorflow/compiler/xla:shape_util",
         "//tensorflow/compiler/xla:statusor",
         "//tensorflow/compiler/xla:util",
@@ -211,7 +205,6 @@ cc_library(
         ":ir_array",
         ":kernel_support_library",
         ":llvm_loop",
-        ":llvm_target_helper",
         ":llvm_util",
         ":loop_emitter",
         "//tensorflow/compiler/xla:shape_util",

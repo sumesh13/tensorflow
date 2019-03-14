@@ -113,7 +113,7 @@ llvm::CallInst* EmitCallToIntrinsic(
 // for each overloaded type. Typically, overloaded intrinsics have only a single
 // overloaded type.
 llvm::CallInst* EmitCallToTargetIntrinsic(
-    TargetIntrinsicID intrin, absl::Span<llvm::Value* const> operands,
+    TargetIntrinsicID intrinsic_id, absl::Span<llvm::Value* const> operands,
     absl::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b);
 
 // Emit float max. Emit maxnum intrinsic is fast math is disabled, or

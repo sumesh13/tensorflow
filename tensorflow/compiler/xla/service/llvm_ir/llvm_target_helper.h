@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_FEATURES_H_
-#define TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_FEATURES_H_
+#ifndef TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_HELPER_H_
+#define TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_HELPER_H_
 
 #include <string>
 #include "llvm/ADT/Triple.h"
@@ -24,7 +24,7 @@ limitations under the License.
 namespace xla {
 namespace llvm_ir {
 // Enmerations to get target specific intrinsics or function calls
-typedef enum  TargetIntrinsicID {
+enum TargetIntrinsicID {
   kShfl_down_f32,
   kShfl_down_i32,
   kThread_id_x,
@@ -34,6 +34,7 @@ typedef enum  TargetIntrinsicID {
   kBlock_id_y,
   kBlock_id_z,
   kBarrier_id,
+  kLast_id
 };
 
 struct TargetIntrinsics {
@@ -41,15 +42,9 @@ struct TargetIntrinsics {
   llvm::Intrinsic::ID amdgpu_intrinsic;
 };
 
-
 typedef struct TargetIntrinsics GPUIntrinsics; 
-
-//GPUIntrinsics GetIntrinsic(TargetIntrinsicID intrin);
-
-//llvm::Intrinsic::ID GetLLVMIntrinsicID(TargetIntrinsicID intrin, 
-//        llvm::Module* module);
 
 }  // namespace gpu
 }  // namespace xla
 
-#endif  // TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_FEATURES_H_
+#endif  // TENSORFLOW_COMPILER_XLA_SERVICE_LLVM_IR_LLVM_TARGET_HELPER_H_
